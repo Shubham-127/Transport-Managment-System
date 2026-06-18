@@ -4,13 +4,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
-import io.jsonwebtoken.Jwts;
+
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
-public class jwtUtil {
+public class JwtUtil {
 
 private SecretKey getSigningKey(){
     return Keys.hmacShaKeyFor(JwtCredential.SECRET.getBytes());
@@ -38,7 +37,7 @@ public boolean validateToken(String token, String email){
     return extractEmail(token).equals(email)&& !isTokenExpired(token);
 }
     private Claims getClaims(String token) {
-        return Jwts.parserBuilder()
+        return Jwts.parser()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
