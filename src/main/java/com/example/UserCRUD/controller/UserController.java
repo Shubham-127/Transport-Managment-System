@@ -1,7 +1,9 @@
 package com.example.UserCRUD.controller;
 
+import com.example.UserCRUD.dto.request.LoginRequestdto;
 import com.example.UserCRUD.dto.request.UpdateRequestdto;
 import com.example.UserCRUD.dto.request.createRequestdto;
+import com.example.UserCRUD.dto.response.LoginResponsedto;
 import com.example.UserCRUD.dto.response.responsedto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -40,5 +42,9 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id){
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponsedto> login(@RequestBody LoginRequestdto request) {
+        return ResponseEntity.ok(userService.login(request));
     }
 }
