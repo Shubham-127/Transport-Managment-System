@@ -12,4 +12,5 @@ public interface CustomerMasterRepository extends JpaRepository<CustomerMaster, 
 
     Optional<CustomerMaster> findByName(String customerName);
     boolean existsByName(String customerName);
+    boolean existsByCustomerId(Long customerId);
 }
