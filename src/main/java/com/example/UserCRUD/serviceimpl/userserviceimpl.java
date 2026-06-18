@@ -1,10 +1,13 @@
 package com.example.UserCRUD.serviceimpl;
 
+import com.example.UserCRUD.dto.request.LoginRequestdto;
 import com.example.UserCRUD.dto.request.UpdateRequestdto;
 import com.example.UserCRUD.dto.request.createRequestdto;
+import com.example.UserCRUD.dto.response.LoginResponsedto;
 import com.example.UserCRUD.dto.response.RoleResponsedto;
 import com.example.UserCRUD.dto.response.responsedto;
 import com.example.UserCRUD.exception.ResourceNotFoundException;
+import com.example.UserCRUD.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import com.example.UserCRUD.model.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 public class userserviceimpl implements UserService {
     private final userRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
     @Override
     public responsedto createUser(createRequestdto request) {
         if(userRepository.existsByEmail(request.getEmail())){
@@ -62,6 +66,23 @@ public class userserviceimpl implements UserService {
         User updatedUser = userRepository.save(user);
 
         return mapToresponsedto(updatedUser);
+    }
+
+    @Override
+    public LoginResponsedto login(LoginRequestdto request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid email or password");
+        }
+
+        String token = jwtUtil.generateToken(user.getEmail());
+
+        return LoginResponsedto.builder()
+                .Token(token)
+                .email(user.getEmail())
+                .build();
     }
 
     @Override
