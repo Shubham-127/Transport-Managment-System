@@ -1,11 +1,8 @@
 package com.example.UserCRUD.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter@Setter@AllArgsConstructor@NoArgsConstructor
+@Getter@Setter@AllArgsConstructor@NoArgsConstructor@Builder
 public class CreateCustomerMasterRequest {
     private Long customerId;
     private String customerName;

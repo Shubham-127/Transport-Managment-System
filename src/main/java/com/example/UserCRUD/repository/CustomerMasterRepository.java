@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface CustomerMasterRepository extends JpaRepository<CustomerMaster, Long> {
 
-    Optional<CustomerMaster> findByName(String customerName);
-    boolean existsByName(String customerName);
+
     boolean existsByCustomerId(Long customerId);
+    boolean existsByEmail(String email);
 }
