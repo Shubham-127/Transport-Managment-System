@@ -1,9 +1,15 @@
 package com.example.UserCRUD.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "OrderMaster")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class OrderMaster {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +49,8 @@ public class OrderMaster {
     private String shipToCity;
     @Column(nullable = false)
     private String shipToPinCode;
+    @Column(nullable = false)
+    private String shipToState;
     @Column(nullable = false)
     private String unitWeight;
     @Column(nullable = false)
