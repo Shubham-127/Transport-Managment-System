@@ -1,20 +1,17 @@
 package com.example.UserCRUD.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "ItemMaster")
-@Getter@Setter@NoArgsConstructor@AllArgsConstructor
+@Getter@Setter@NoArgsConstructor@AllArgsConstructor@Builder
 public class ItemMaster {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String itemNumber;
 
     @Column(nullable = false)
