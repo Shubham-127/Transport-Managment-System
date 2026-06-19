@@ -1,8 +1,8 @@
 package com.example.UserCRUD.controller;
 
 import com.example.UserCRUD.dto.request.LoginRequestdto;
-import com.example.UserCRUD.dto.request.UpdateRequestdto;
-import com.example.UserCRUD.dto.request.createRequestdto;
+import com.example.UserCRUD.dto.request.UpdateUserRequestdto;
+import com.example.UserCRUD.dto.request.CreateUserRequestdto;
 import com.example.UserCRUD.dto.response.LoginResponsedto;
 import com.example.UserCRUD.dto.response.responsedto;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<responsedto> createUser(@RequestBody createRequestdto request) {
+    public ResponseEntity<responsedto> createUser(@RequestBody CreateUserRequestdto request) {
         responsedto response = userService.createUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -32,7 +32,7 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<responsedto> updateUser(
             @PathVariable Long id,
-            @RequestBody UpdateRequestdto request
+            @RequestBody UpdateUserRequestdto request
             ){
         responsedto updated = userService.updateUser(id, request);
         return ResponseEntity.ok(updated);
