@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter@Setter@NoArgsConstructor@AllArgsConstructor
-public class UpdateRequestdto {
+public class UpdateUserRequestdto {
     private String name;
     private String email;
 
