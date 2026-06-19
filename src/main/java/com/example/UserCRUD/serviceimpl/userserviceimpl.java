@@ -1,8 +1,8 @@
 package com.example.UserCRUD.serviceimpl;
 
 import com.example.UserCRUD.dto.request.LoginRequestdto;
-import com.example.UserCRUD.dto.request.UpdateRequestdto;
-import com.example.UserCRUD.dto.request.createRequestdto;
+import com.example.UserCRUD.dto.request.UpdateUserRequestdto;
+import com.example.UserCRUD.dto.request.CreateUserRequestdto;
 import com.example.UserCRUD.dto.response.LoginResponsedto;
 import com.example.UserCRUD.dto.response.RoleResponsedto;
 import com.example.UserCRUD.dto.response.responsedto;
@@ -27,7 +27,7 @@ public class userserviceimpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     @Override
-    public responsedto createUser(createRequestdto request) {
+    public responsedto createUser(CreateUserRequestdto request) {
         if(userRepository.existsByEmail(request.getEmail())){
             throw new RuntimeException("Email already in use:" + request.getEmail());
 
@@ -58,7 +58,7 @@ public class userserviceimpl implements UserService {
     }
 
     @Override
-    public responsedto updateUser(Long id, UpdateRequestdto request) {
+    public responsedto updateUser(Long id, UpdateUserRequestdto request) {
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with this id:" +id));
         user.setName(request.getName());
         user.setEmail(request.getEmail());
