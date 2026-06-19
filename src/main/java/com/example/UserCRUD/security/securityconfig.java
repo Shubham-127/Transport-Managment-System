@@ -42,7 +42,7 @@ public class securityconfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Login and registration endpoints are OPEN — no token needed yet
-                        .requestMatchers("/api/users/login", "/api/users").permitAll()
+                        .requestMatchers("/api/users","/api/users/login").permitAll()
                         // Everything else requires a valid JWT
                         .anyRequest().authenticated()
                 )

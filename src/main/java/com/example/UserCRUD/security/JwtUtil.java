@@ -20,7 +20,7 @@ public String generateToken(String email){
     return Jwts.builder()
             .setSubject(email)
             .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis()+ JwtCredential.EXPIRY))
+            .setExpiration(new Date(System.currentTimeMillis()+ JwtCredential.EXPIRATION))
             .signWith(getSigningKey())
             .compact();
 
@@ -37,7 +37,7 @@ public boolean validateToken(String token, String email){
     return extractEmail(token).equals(email)&& !isTokenExpired(token);
 }
     private Claims getClaims(String token) {
-        return Jwts.parser()
+        return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
