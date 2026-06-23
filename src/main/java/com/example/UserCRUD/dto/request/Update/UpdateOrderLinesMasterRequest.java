@@ -1,4 +1,4 @@
-package com.example.UserCRUD.dto.request;
+package com.example.UserCRUD.dto.request.Update;
 
 import lombok.*;
 

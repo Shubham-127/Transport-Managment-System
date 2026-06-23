@@ -1,10 +1,8 @@
 package com.example.UserCRUD.controller;
 
-import com.example.UserCRUD.dto.request.CreateOrderLinesMasterRequest;
-import com.example.UserCRUD.dto.request.UpdateOrderLinesMasterRequest;
+import com.example.UserCRUD.dto.request.Create.CreateOrderLinesMasterRequest;
+import com.example.UserCRUD.dto.request.Update.UpdateOrderLinesMasterRequest;
 import com.example.UserCRUD.dto.response.OrderLinesMasterResponse;
-import com.example.UserCRUD.dto.response.OrderLinesMasterResponse;
-import com.example.UserCRUD.repository.OrderLinesMasterRepository;
 import com.example.UserCRUD.service.OrderLinesMasterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

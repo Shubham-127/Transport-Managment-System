@@ -1,7 +1,7 @@
 package com.example.UserCRUD.serviceimpl;
 
-import com.example.UserCRUD.dto.request.CreateOrderLinesMasterRequest;
-import com.example.UserCRUD.dto.request.UpdateOrderLinesMasterRequest;
+import com.example.UserCRUD.dto.request.Create.CreateOrderLinesMasterRequest;
+import com.example.UserCRUD.dto.request.Update.UpdateOrderLinesMasterRequest;
 import com.example.UserCRUD.dto.response.OrderLinesMasterResponse;
 import com.example.UserCRUD.exception.ResourceNotFoundException;
 import com.example.UserCRUD.model.OrderLinesMaster;
@@ -41,7 +41,7 @@ public class OrderLinesMasterServiceImpl implements OrderLinesMasterService {
         // Step 2 — build the line using the builder pattern,
         // explicitly setting the foreign key to the parent order's id
         OrderLinesMaster line = OrderLinesMaster.builder()
-                .orderMasterId(order.getId())
+                .orderMaster(order)
                 .lineNumber(request.getLineNumber())
                 .itemNumber(request.getItemNumber())
                 .description(request.getDescription())
@@ -95,7 +95,7 @@ public class OrderLinesMasterServiceImpl implements OrderLinesMasterService {
         // duplicate row
         OrderLinesMaster updatedLine = OrderLinesMaster.builder()
                 .id(existing.getId())
-                .orderMasterId(existing.getOrderMasterId())
+                .orderMaster(existing.getOrderMaster())
                 .lineNumber(request.getLineNumber())
                 .itemNumber(request.getItemNumber())
                 .description(request.getDescription())
@@ -128,7 +128,7 @@ public class OrderLinesMasterServiceImpl implements OrderLinesMasterService {
     private OrderLinesMasterResponse mapToResponseDTO(OrderLinesMaster line) {
         return OrderLinesMasterResponse.builder()
                 .id(line.getId())
-                .orderMasterId(line.getOrderMasterId())
+                .orderMasterId(line.getOrderMaster().getId())
                 .lineNumber(line.getLineNumber())
                 .itemNumber(line.getItemNumber())
                 .description(line.getDescription())

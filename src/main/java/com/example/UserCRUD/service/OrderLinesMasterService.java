@@ -1,7 +1,7 @@
 package com.example.UserCRUD.service;
 
-import com.example.UserCRUD.dto.request.CreateOrderLinesMasterRequest;
-import com.example.UserCRUD.dto.request.UpdateOrderLinesMasterRequest;
+import com.example.UserCRUD.dto.request.Create.CreateOrderLinesMasterRequest;
+import com.example.UserCRUD.dto.request.Update.UpdateOrderLinesMasterRequest;
 import com.example.UserCRUD.dto.response.OrderLinesMasterResponse;
 import java.util.List;
 

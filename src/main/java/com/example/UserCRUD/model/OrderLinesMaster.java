@@ -16,12 +16,9 @@ public class OrderLinesMaster {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // This is the FOREIGN KEY — it stores the id of the OrderMaster
-    // that this line belongs to. We use a plain Long here (not a
-    // @ManyToOne relationship) to keep things simple and explicit —
-    // every line just remembers which order's id it belongs to.
-    @Column(nullable = false)
-    private Long orderMasterId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_master_id",nullable = false)
+    private OrderMaster orderMaster;
 
     @Column(nullable = false)
     private Integer lineNumber;
