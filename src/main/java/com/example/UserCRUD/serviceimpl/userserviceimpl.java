@@ -1,8 +1,8 @@
 package com.example.UserCRUD.serviceimpl;
 
 import com.example.UserCRUD.dto.request.LoginRequestdto;
-import com.example.UserCRUD.dto.request.UpdateUserRequestdto;
-import com.example.UserCRUD.dto.request.CreateUserRequestdto;
+import com.example.UserCRUD.dto.request.Update.UpdateUserRequestdto;
+import com.example.UserCRUD.dto.request.Create.CreateUserRequestdto;
 import com.example.UserCRUD.dto.response.LoginResponsedto;
 import com.example.UserCRUD.dto.response.RoleResponsedto;
 import com.example.UserCRUD.dto.response.responsedto;

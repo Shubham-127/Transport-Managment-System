@@ -1,4 +1,4 @@
-package com.example.UserCRUD.dto.request;
+package com.example.UserCRUD.dto.request.Update;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,10 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter@Setter@NoArgsConstructor@AllArgsConstructor
-public class CreateUserRequestdto {
-
+public class UpdateUserRequestdto {
     private String name;
     private String email;
 
-    private String password;
 }
