@@ -3,6 +3,8 @@ package com.example.UserCRUD.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "OrderMaster")
 @Getter
@@ -24,8 +26,9 @@ public class OrderMaster {
     @Column(nullable = false)
     private String company;
 
-    @Column(nullable = false)
-    private String customerNumber;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id",nullable = false)
+    private CustomerMaster customer;
 
     @Column(nullable = false)
     private String orderDate;
@@ -63,6 +66,9 @@ public class OrderMaster {
     private String status;
     @Column(nullable = false)
     private String currencyCode;
+
+    @OneToMany(mappedBy = "orderMaster",fetch = FetchType.LAZY)
+    private List<OrderLinesMaster> Lines;
 
 
 }

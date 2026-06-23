@@ -1,10 +1,12 @@
 package com.example.UserCRUD.serviceimpl;
 
-import com.example.UserCRUD.dto.request.CreateOrderMasterRequest;
-import com.example.UserCRUD.dto.request.UpdateOrderMasterRequest;
+import com.example.UserCRUD.dto.request.Create.CreateOrderMasterRequest;
+import com.example.UserCRUD.dto.request.Update.UpdateOrderMasterRequest;
 import com.example.UserCRUD.dto.response.OrderMasterResponse;
 import com.example.UserCRUD.exception.ResourceNotFoundException;
+import com.example.UserCRUD.model.CustomerMaster;
 import com.example.UserCRUD.model.OrderMaster;
+import com.example.UserCRUD.repository.CustomerMasterRepository;
 import com.example.UserCRUD.repository.OrderMasterRepository;
 import com.example.UserCRUD.service.OrderMasterService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 public class OrderMasterServiceImpl implements OrderMasterService {
 
     private final OrderMasterRepository orderMasterRepository;
+    private final CustomerMasterRepository customerMasterRepository;
 
     @Override
     public OrderMasterResponse createOrder(CreateOrderMasterRequest request) {
@@ -26,11 +29,16 @@ public class OrderMasterServiceImpl implements OrderMasterService {
             throw new RuntimeException("Order already exists with orderNumber: " + request.getOrderNumber());
         }
 
+        Long customerIdAsLong = Long.parseLong(request.getCustomerNumber());
+
+        CustomerMaster customer = customerMasterRepository.findByCustomerId(customerIdAsLong)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with customerNumber:" + request.getCustomerNumber()));
+
         OrderMaster order = OrderMaster.builder()
                 .orderNumber(Long.valueOf(request.getOrderNumber()))
                 .orderType(request.getOrderType())
                 .company(request.getCompany())
-                .customerNumber(request.getCustomerNumber())
+                .customer(customer)
                 .orderDate(request.getOrderDate())
                 .requestedDate(request.getRequestedDate())
                 .branchPlant(request.getBranchPlant())
@@ -72,12 +80,17 @@ public class OrderMasterServiceImpl implements OrderMasterService {
         OrderMaster existing = orderMasterRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
 
+        Long customerIdAsLong = Long.parseLong(request.getCustomerNumber());
+        CustomerMaster customer = customerMasterRepository.findByCustomerId(customerIdAsLong)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Customer not found with customerNumber: " + request.getCustomerNumber()));
+
         OrderMaster updatedOrder = OrderMaster.builder()
                 .id(existing.getId())
                 .orderNumber(Long.valueOf(request.getOrderNumber()))
                 .orderType(request.getOrderType())
                 .company(request.getCompany())
-                .customerNumber(request.getCustomerNumber())
+                .customer(customer)
                 .orderDate(request.getOrderDate())
                 .requestedDate(request.getRequestedDate())
                 .branchPlant(request.getBranchPlant())
@@ -112,7 +125,8 @@ public class OrderMasterServiceImpl implements OrderMasterService {
                 .orderNumber(order.getOrderNumber())
                 .orderType(order.getOrderType())
                 .company(order.getCompany())
-                .customerNumber(order.getCustomerNumber())
+                .customerNumber(String.valueOf(order.getCustomer().getCustomerId()))
+
                 .orderDate(order.getOrderDate())
                 .requestedDate(order.getRequestedDate())
                 .branchPlant(order.getBranchPlant())
