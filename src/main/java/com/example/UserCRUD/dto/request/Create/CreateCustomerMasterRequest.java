@@ -1,12 +1,9 @@
-package com.example.UserCRUD.dto.request;
+package com.example.UserCRUD.dto.request.Create;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter@Setter@AllArgsConstructor@NoArgsConstructor
-public class UpdateCustomerMasterRequest {
+@Getter@Setter@AllArgsConstructor@NoArgsConstructor@Builder
+public class CreateCustomerMasterRequest {
     private Long customerId;
     private String customerName;
     private String getNumber;
@@ -22,4 +19,5 @@ public class UpdateCustomerMasterRequest {
     private String active;
     private String remarks;
     private String salesOrder;
+
 }

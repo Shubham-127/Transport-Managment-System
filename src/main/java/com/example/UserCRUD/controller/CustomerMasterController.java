@@ -1,12 +1,8 @@
 package com.example.UserCRUD.controller;
 
-import com.example.UserCRUD.dto.request.CreateCustomerMasterRequest;
-import com.example.UserCRUD.dto.request.CreateCustomerMasterRequest;
-import com.example.UserCRUD.dto.request.UpdateCustomerMasterRequest;
-import com.example.UserCRUD.dto.request.UpdateCustomerMasterRequest;
+import com.example.UserCRUD.dto.request.Create.CreateCustomerMasterRequest;
+import com.example.UserCRUD.dto.request.Update.UpdateCustomerMasterRequest;
 import com.example.UserCRUD.dto.response.CustomerMasterResponse;
-import com.example.UserCRUD.dto.response.CustomerMasterResponse;
-import com.example.UserCRUD.service.CustomerMasterService;
 import com.example.UserCRUD.service.CustomerMasterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

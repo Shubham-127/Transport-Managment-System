@@ -1,7 +1,10 @@
 package com.example.UserCRUD.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "CustomerMaster")
@@ -56,6 +59,10 @@ public class CustomerMaster {
 
     @Column(nullable = false)
     private String salesOrder;
+
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<OrderMaster> orders;
 
 
 

@@ -9,8 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface CustomerMasterRepository extends JpaRepository<CustomerMaster, Long> {
-
-
+    Optional<CustomerMaster> findByCustomerId(Long customerId);
     boolean existsByCustomerId(Long customerId);
     boolean existsByEmail(String email);
 }

@@ -1,7 +1,7 @@
 package com.example.UserCRUD.service;
 
-import com.example.UserCRUD.dto.request.CreateCustomerMasterRequest;
-import com.example.UserCRUD.dto.request.UpdateCustomerMasterRequest;
+import com.example.UserCRUD.dto.request.Create.CreateCustomerMasterRequest;
+import com.example.UserCRUD.dto.request.Update.UpdateCustomerMasterRequest;
 import com.example.UserCRUD.dto.response.CustomerMasterResponse;
 
 import java.util.List;
