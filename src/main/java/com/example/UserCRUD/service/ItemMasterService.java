@@ -1,8 +1,8 @@
 package com.example.UserCRUD.service;
 
 
-import com.example.UserCRUD.dto.request.CreateItemMasterRequest;
-import com.example.UserCRUD.dto.request.UpdateItemMasterRequest;
+import com.example.UserCRUD.dto.request.Create.CreateItemMasterRequest;
+import com.example.UserCRUD.dto.request.Update.UpdateItemMasterRequest;
 import com.example.UserCRUD.dto.response.ItemMasterResponse;
 
 import java.util.List;
