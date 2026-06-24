@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -70,7 +71,8 @@ public class TransportMaster {
     // @JsonIgnore prevents infinite recursion when this entity gets
     // converted to JSON: without it, Transport → Vehicles → Transport
     // → Vehicles ... forever
-    @OneToMany(mappedBy = "transportMaster", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "transportMaster", fetch = FetchType.LAZY, cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonIgnore
-    private List<VehicleMaster> vehicles;
+    @Builder.Default
+    private List<VehicleMaster> vehicles = new ArrayList<>();
 }

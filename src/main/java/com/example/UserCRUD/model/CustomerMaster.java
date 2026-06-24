@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -60,9 +61,11 @@ public class CustomerMaster {
     @Column(nullable = false)
     private String salesOrder;
 
-    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+
     @JsonIgnore
-    private List<OrderMaster> orders;
+    @Builder.Default
+    private List<OrderMaster> orders = new ArrayList<>();
 
 
 

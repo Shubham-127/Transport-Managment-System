@@ -1,8 +1,10 @@
 package com.example.UserCRUD.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -67,8 +69,10 @@ public class OrderMaster {
     @Column(nullable = false)
     private String currencyCode;
 
-    @OneToMany(mappedBy = "orderMaster",fetch = FetchType.LAZY)
-    private List<OrderLinesMaster> Lines;
+    @OneToMany(mappedBy = "orderMaster",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    @Builder.Default
+    private List<OrderLinesMaster> Lines = new ArrayList<>();
 
 
 }
