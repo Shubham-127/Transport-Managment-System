@@ -2,6 +2,7 @@ package com.example.UserCRUD.controller;
 
 import com.example.UserCRUD.dto.request.Create.CreateCustomerMasterRequest;
 import com.example.UserCRUD.dto.request.Update.UpdateCustomerMasterRequest;
+import com.example.UserCRUD.dto.response.CustomerFullDetailsResponse;
 import com.example.UserCRUD.dto.response.CustomerMasterResponse;
 import com.example.UserCRUD.service.CustomerMasterService;
 import lombok.RequiredArgsConstructor;
@@ -49,5 +50,10 @@ public class CustomerMasterController {
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
         customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/full-details")
+    public ResponseEntity<CustomerFullDetailsResponse> getCustomerFullDetails(@PathVariable Long id) {
+        return ResponseEntity.ok(customerService.getCustomerFullDetails(id));
     }
 }
