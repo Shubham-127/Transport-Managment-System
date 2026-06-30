@@ -25,7 +25,7 @@ public class OrderWithLinesResponse {
     private String shipToPinCode;
     private String unitWeight;
     private String weightUnit;
-    private String unitVolume;
+    private String totalVolume;
     private String volumeUnit;
     private String status;
     private String currencyCode;

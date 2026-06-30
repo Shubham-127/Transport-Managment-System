@@ -61,7 +61,7 @@ public class OrderMaster {
     @Column(nullable = false)
     private String weightUnit;
     @Column(nullable = false)
-    private String unitVolume;
+    private String totalVolume;
     @Column(nullable = false)
     private String volumeUnit;
     @Column(nullable = false)

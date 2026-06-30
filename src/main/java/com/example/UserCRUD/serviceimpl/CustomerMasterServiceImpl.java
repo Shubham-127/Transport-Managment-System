@@ -110,7 +110,7 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
                 .shipToPinCode(order.getShipToPinCode())
                 .unitWeight(order.getUnitWeight())
                 .weightUnit(order.getWeightUnit())
-                .unitVolume(order.getUnitVolume())
+                .totalVolume(order.getTotalVolume())
                 .volumeUnit(order.getVolumeUnit())
                 .status(order.getStatus())
                 .currencyCode(order.getCurrencyCode())
