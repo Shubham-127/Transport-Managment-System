@@ -2,7 +2,7 @@ package com.example.UserCRUD.integration.jde.connector;
 
 import com.example.UserCRUD.integration.common.ErpConnector;
 import com.example.UserCRUD.integration.common.domain.ErpOrder;
-import com.example.UserCRUD.integration.jde.client.JdeApiClient;
+import com.example.UserCRUD.integration.jde.client.JdeOrderApiClient;
 import com.example.UserCRUD.integration.jde.dto.JdeOrderResponse;
 import com.example.UserCRUD.integration.jde.mapper.JdeOrderMapper;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +15,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class JdeConnector implements ErpConnector {
 
-    private final JdeApiClient jdeApiClient;
+    private final JdeOrderApiClient jdeOrderApiClient;
     private final JdeOrderMapper jdeOrderMapper;
 
     @Override
     public List<ErpOrder> fetchOrders() {
-        JdeOrderResponse rawResponse = jdeApiClient.getOrders();
+        JdeOrderResponse rawResponse = jdeOrderApiClient.getOrders();
         return rawResponse.getOrders().stream()
                 .map(jdeOrderMapper::toErpOrder)
                 .collect(Collectors.toList());

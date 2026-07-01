@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @Configuration
-public class JdeClientConfig {
+public class JdeOrderClientConfig {
     @Value("${jde.api.base-url}")
     private String baseUrl;
 

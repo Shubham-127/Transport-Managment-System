@@ -6,6 +6,7 @@ import com.example.UserCRUD.model.CustomerMaster;
 import com.example.UserCRUD.model.OrderLinesMaster;
 import com.example.UserCRUD.model.OrderMaster;
 import com.example.UserCRUD.repository.CustomerMasterRepository;
+import com.example.UserCRUD.repository.OrderLinesMasterRepository;  // ← ADDED
 import com.example.UserCRUD.repository.OrderMasterRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ public class JdeOrderPersistenceService {
 
     private final OrderMasterRepository orderMasterRepository;
     private final CustomerMasterRepository customerMasterRepository;
+    private final OrderLinesMasterRepository orderLinesMasterRepository; // ← ADDED
 
     @Transactional
     public void saveOrders(List<ErpOrder> erpOrders) {
@@ -56,16 +58,38 @@ public class JdeOrderPersistenceService {
         orderMaster.setShipToPinCode(erpOrder.getShipToPinCode());
         orderMaster.setUnitWeight(erpOrder.getUnitWeight());
         orderMaster.setWeightUnit(erpOrder.getWeightUnit());
-        orderMaster.setTotalVolume(erpOrder.getTotalVolume());
+        orderMaster.setTotalVolume(erpOrder.getTotalVolume());         // unchanged — correct
         orderMaster.setVolumeUnit(erpOrder.getVolumeUnit());
         orderMaster.setStatus(erpOrder.getStatus());
         orderMaster.setCurrencyCode(erpOrder.getCurrencyCode());
 
-        orderMaster.getLines().clear();
-        orderMaster.getLines().addAll(toOrderLines(erpOrder.getLines(), orderMaster));
+        // ★ CHANGED: save parent first so it has a real DB id
+        // before we delete/insert child lines against it
+        OrderMaster savedOrder = orderMasterRepository.save(orderMaster);
 
-        orderMasterRepository.save(orderMaster);
-        log.info("Saved order {} ({} lines)", orderMaster.getOrderNumber(), orderMaster.getLines().size());
+        // ★ CHANGED: replaced getLines().clear() + getLines().addAll()
+        // OLD: orderMaster.getLines().clear();
+        // OLD: orderMaster.getLines().addAll(toOrderLines(...));
+        //
+        // WHY OLD CODE FAILED:
+        // Lines collection is FetchType.LAZY — Hibernate never loads it
+        // into memory unless something explicitly accesses it.
+        // So .clear() was clearing an EMPTY in-memory list,
+        // not actually deleting anything from the database.
+        // Every sync run then .addAll() inserted 11 MORE rows
+        // on top of the existing ones → 451 rows after 41 syncs.
+        //
+        // WHY NEW CODE WORKS:
+        // deleteAllByOrderMaster() goes directly to the database:
+        // DELETE FROM order_line_master WHERE order_master_id = ?
+        // No lazy loading involved. Guaranteed to wipe existing rows.
+        // Then saveAll() inserts exactly 11 fresh rows. Always 11, never growing.
+        orderLinesMasterRepository.deleteAllByOrderMaster(savedOrder);
+
+        List<OrderLinesMaster> freshLines = toOrderLines(erpOrder.getLines(), savedOrder);
+        orderLinesMasterRepository.saveAll(freshLines);
+
+        log.info("Saved order {} ({} lines)", savedOrder.getOrderNumber(), freshLines.size());
     }
 
     private CustomerMaster resolveCustomer(ErpOrder erpOrder) {
