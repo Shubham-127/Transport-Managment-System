@@ -69,7 +69,7 @@ public class OrderMaster {
     @Column(nullable = false)
     private String currencyCode;
 
-    @OneToMany(mappedBy = "orderMaster",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "orderMaster",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     @Builder.Default
     private List<OrderLinesMaster> Lines = new ArrayList<>();
