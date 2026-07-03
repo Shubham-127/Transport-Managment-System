@@ -11,10 +11,11 @@ import lombok.Setter;
 public class JdeVehicle {
     private String vehicleNumber;
     private String VehicleType;
-    private int MaxWeightCapacity;
+    private Integer MaxWeightCapacity;
     private String totalWeight;
-    private int maxVolumeCapacity;
+    private Integer maxVolumeCapacity;
     private String totalVolume;
     private String status;
+    private String gpsDeviceId;
 
 }

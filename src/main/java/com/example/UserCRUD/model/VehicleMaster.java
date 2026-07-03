@@ -42,4 +42,10 @@ public class VehicleMaster {
 
     @Column(nullable = false)
     private String status;
+
+    @Column
+    private String totalWeight;
+
+    @Column
+    private String totalVolume;
 }
