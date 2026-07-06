@@ -8,6 +8,9 @@ import lombok.Setter;
 @Getter@Setter@NoArgsConstructor@AllArgsConstructor
 public class UpdateStopMasterRequest {
 
-    private Double distanceFromSource;
-    private String stopName;
+    private Long routeMasterId;
+    private Integer stopSequence;
+    private String stopLocation;
+    private Double distanceFromPrevious;
+    private String estimatedTimeFromPrevious;
 }

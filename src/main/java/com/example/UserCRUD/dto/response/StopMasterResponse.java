@@ -6,7 +6,9 @@ import lombok.*;
 public class StopMasterResponse {
     private Long id;
     private Long routeMasterId;
+    private Integer stopSequence;
+    private String stopLocation;
+    private Double distanceFromPrevious;
+    private String estimatedTimeFromPrevious;
     private String routeCode;
-    private Double distanceFromSource;
-    private String stopName;
 }

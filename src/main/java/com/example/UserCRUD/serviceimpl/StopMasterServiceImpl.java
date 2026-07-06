@@ -28,8 +28,10 @@ public class StopMasterServiceImpl implements StopMasterService {
                 .orElseThrow(() -> new ResourceNotFoundException("Route not found with id: " + routeId));
         StopMaster stop = StopMaster.builder()
                 .routeMaster(route)
-                .distanceFromSource(request.getDistanceFromSource())
-                .stopName(request.getStopName())
+                .stopSequence(request.getStopSequence())
+                .stopLocation(request.getStopLocation())
+                .distanceFromPrevious(request.getDistanceFromPrevious())
+                .estimatedTimeFromPrevious(request.getEstimatedTimeFromPrevious())
                 .build();
 
         StopMaster saved = stopMasterRepository.save(stop);
@@ -63,8 +65,10 @@ public class StopMasterServiceImpl implements StopMasterService {
         StopMaster updatedStop = StopMaster.builder()
                 .id(existing.getId())
                 .routeMaster(existing.getRouteMaster())
-                .distanceFromSource(request.getDistanceFromSource())
-                .stopName(request.getStopName())
+                .stopSequence(request.getStopSequence())
+                .stopLocation(request.getStopLocation())
+                .distanceFromPrevious(request.getDistanceFromPrevious())
+                .estimatedTimeFromPrevious(request.getEstimatedTimeFromPrevious())
                 .build();
 
         StopMaster saved = stopMasterRepository.save(updatedStop);
@@ -83,8 +87,10 @@ public class StopMasterServiceImpl implements StopMasterService {
                 .id(stop.getId())
                 .routeMasterId(stop.getRouteMaster().getId())
                 .routeCode(stop.getRouteMaster().getRouteCode())
-                .distanceFromSource(stop.getDistanceFromSource())
-                .stopName(stop.getStopName())
+                .stopSequence(stop.getStopSequence())
+                .stopLocation(stop.getStopLocation())
+                .distanceFromPrevious(stop.getDistanceFromPrevious())
+                .estimatedTimeFromPrevious(stop.getEstimatedTimeFromPrevious())
                 .build();
     }
 }
