@@ -101,7 +101,7 @@ public class JdeOrderPersistenceService {
         CustomerMaster customer = CustomerMaster.builder()
                 .customerId(erpOrder.getCustomerNumber())
                 .customerName(safe(erpOrder.getShipToCustomerName()))
-                .getNumber("N/A")
+                .gstNumber("N/A")
                 .panNumber("N/A")
                 .contactPerson("N/A")
                 .mobile("N/A")
