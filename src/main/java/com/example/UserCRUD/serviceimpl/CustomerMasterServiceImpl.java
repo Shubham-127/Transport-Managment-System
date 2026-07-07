@@ -2,23 +2,21 @@ package com.example.UserCRUD.serviceimpl;
 
 import com.example.UserCRUD.dto.request.Create.CreateCustomerMasterRequest;
 import com.example.UserCRUD.dto.request.Update.UpdateCustomerMasterRequest;
-import com.example.UserCRUD.dto.response.CustomerFullDetailsResponse;
-import com.example.UserCRUD.dto.response.CustomerMasterResponse;
-import com.example.UserCRUD.dto.response.OrderLinesMasterResponse;
-import com.example.UserCRUD.dto.response.OrderWithLinesResponse;
+import com.example.UserCRUD.dto.response.*;
 import com.example.UserCRUD.exception.ResourceNotFoundException;
-import com.example.UserCRUD.model.CustomerMaster;
-import com.example.UserCRUD.model.OrderLinesMaster;
-import com.example.UserCRUD.model.OrderMaster;
-import com.example.UserCRUD.repository.CustomerMasterRepository;
-import com.example.UserCRUD.repository.OrderLinesMasterRepository;
-import com.example.UserCRUD.repository.OrderMasterRepository;
+import com.example.UserCRUD.model.*;
+import com.example.UserCRUD.repository.*;
 import com.example.UserCRUD.service.CustomerMasterService;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
-
+import java.util.Set;
+import java.util.Map;
+import java.util.Comparator;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +26,8 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
     private final CustomerMasterRepository customerMasterRepository;
     // NEW — needed to fetch this customer's orders
     private final OrderMasterRepository orderMasterRepository;
+    private final RouteMasterRepository routeMasterRepository;
+    private final StopMasterRepository stopMasterRepository;
 
     // NEW — needed to fetch each order's lines
     private final OrderLinesMasterRepository orderLinesMasterRepository;
@@ -71,7 +71,7 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
                 .id(customer.getId())
                 .customerId(customer.getCustomerId())
                 .customerName(customer.getCustomerName())
-                .getNumber(customer.getGetNumber())
+                .gstNumber(customer.getGstNumber())
                 .panNumber(customer.getPanNumber())
                 .contactPerson(customer.getContactPerson())
                 .mobile(customer.getMobile())
@@ -87,6 +87,7 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
                 .orders(ordersWithLines)
                 .build();
     }
+
 
     // ─── NEW PRIVATE HELPERS ──────────────────────────────────
 
@@ -153,7 +154,7 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
         CustomerMaster customer = CustomerMaster.builder()
                 .customerId(request.getCustomerId())
                 .customerName(request.getCustomerName())
-                .getNumber(request.getGetNumber())
+                .gstNumber(request.getGstNumber())
                 .panNumber(request.getPanNumber())
                 .contactPerson(request.getContactPerson())
                 .mobile(request.getMobile())
@@ -197,7 +198,7 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
                 .id(existing.getId())
                 .customerId(request.getCustomerId())
                 .customerName(request.getCustomerName())
-                .getNumber(request.getGetNumber())
+                .gstNumber(request.getGstNumber())
                 .panNumber(request.getPanNumber())
                 .contactPerson(request.getContactPerson())
                 .mobile(request.getMobile())
@@ -228,7 +229,7 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
                 .id(customer.getId())
                 .customerId(customer.getCustomerId())
                 .customerName(customer.getCustomerName())
-                .getNumber(customer.getGetNumber())
+                .gstNumber(customer.getGstNumber())
                 .panNumber(customer.getPanNumber())
                 .contactPerson(customer.getContactPerson())
                 .mobile(customer.getMobile())
@@ -242,5 +243,77 @@ public class CustomerMasterServiceImpl implements CustomerMasterService {
                 .remarks(customer.getRemarks())
                 .salesOrder(customer.getSalesOrder())
                 .build();
+    }
+
+
+    @Override
+    public CustomerOrderWithRouteResponse getCustomerOrderWithRouteResponse(Long id) {
+
+        CustomerFullDetailsResponse customerFullDetails = getCustomerFullDetails(id);
+        List<OrderWithLinesResponse> orders = customerFullDetails.getOrders();
+
+        // group this customer's orders by normalized shipToCity
+        Map<String, List<OrderWithLinesResponse>> ordersByCity = orders.stream()
+                .collect(Collectors.groupingBy(o -> normalize(o.getShipToCity())));
+
+        List<RouteMaster> allRoutes = routeMasterRepository.findAll();
+        List<StopMaster> allStops = stopMasterRepository.findAll();
+
+        Map<Long, List<StopMaster>> stopsByRouteId = allStops.stream()
+                .collect(Collectors.groupingBy(stop -> stop.getRouteMaster().getId()));
+
+        List<RouteWithOrderResponse> routeResponses = allRoutes.stream()
+                .map(route -> {
+                    List<StopWithOrdersResponse> stopResponses = stopsByRouteId
+                            .getOrDefault(route.getId(), List.of())
+                            .stream()
+                            .sorted(Comparator.comparing(StopMaster::getStopSequence))
+                            .map(stop -> StopWithOrdersResponse.builder()
+                                    .id(stop.getId())
+                                    .stopSequence(stop.getStopSequence())
+                                    .stopLocation(stop.getStopLocation())
+                                    .distanceFromPrevious(stop.getDistanceFromPrevious())
+                                    .estimatedTimeFromPrevious(stop.getEstimatedTimeFromPrevious())
+                                    .orders(ordersByCity.getOrDefault(normalize(stop.getStopLocation()), List.of()))
+                                    .build())
+                            .collect(Collectors.toList());
+
+                    return RouteWithOrderResponse.builder()
+                            .id(route.getId())
+                            .routeCode(route.getRouteCode())
+                            .sourceLocation(route.getSourceLocation())
+                            .destinationLocation(route.getDestinationLocation())
+                            .distance(route.getDistance())
+                            .estimatedTime(route.getEstimatedTime())
+                            .stops(stopResponses)
+                            .build();
+                })
+                // only keep routes where at least one stop actually has a matched order
+                .filter(routeResp -> routeResp.getStops().stream().anyMatch(s -> !s.getOrders().isEmpty()))
+                .collect(Collectors.toList());
+
+        return CustomerOrderWithRouteResponse.builder()
+                .id(customerFullDetails.getId())
+                .customerId(customerFullDetails.getCustomerId())
+                .customerName(customerFullDetails.getCustomerName())
+                .gstNumber(customerFullDetails.getGstNumber())
+                .panNumber(customerFullDetails.getPanNumber())
+                .contactPerson(customerFullDetails.getContactPerson())
+                .mobile(customerFullDetails.getMobile())
+                .email(customerFullDetails.getEmail())
+                .address(customerFullDetails.getAddress())
+                .city(customerFullDetails.getCity())
+                .state(customerFullDetails.getState())
+                .pincode(customerFullDetails.getPincode())
+                .country(customerFullDetails.getCountry())
+                .active(customerFullDetails.getActive())
+                .remarks(customerFullDetails.getRemarks())
+                .salesOrder(customerFullDetails.getSalesOrder())
+                .route(routeResponses)
+                .build();
+    }
+
+    private String normalize(String city) {
+        return city == null ? "" : city.trim().toLowerCase();
     }
 }
