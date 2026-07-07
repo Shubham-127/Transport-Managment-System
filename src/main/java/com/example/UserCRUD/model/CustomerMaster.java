@@ -22,8 +22,8 @@ public class CustomerMaster {
     @Column(nullable = false)
     private String customerName;
 
-    @Column(nullable = false)
-    private String getNumber;
+    @Column(nullable = true)
+    private String gstNumber;
 
     @Column(nullable = false)
     private String panNumber;
