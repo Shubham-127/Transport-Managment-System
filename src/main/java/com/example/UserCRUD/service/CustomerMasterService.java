@@ -4,6 +4,7 @@ import com.example.UserCRUD.dto.request.Create.CreateCustomerMasterRequest;
 import com.example.UserCRUD.dto.request.Update.UpdateCustomerMasterRequest;
 import com.example.UserCRUD.dto.response.CustomerFullDetailsResponse;
 import com.example.UserCRUD.dto.response.CustomerMasterResponse;
+import com.example.UserCRUD.dto.response.CustomerOrderWithRouteResponse;
 
 import java.util.List;
 
@@ -21,4 +22,5 @@ public interface CustomerMasterService {
     void deleteCustomer(Long id);
 
     CustomerFullDetailsResponse getCustomerFullDetails(Long id);
+    CustomerOrderWithRouteResponse getCustomerOrderWithRouteResponse(Long id);
 }
