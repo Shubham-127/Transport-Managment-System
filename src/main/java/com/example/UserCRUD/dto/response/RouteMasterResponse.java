@@ -2,6 +2,8 @@ package com.example.UserCRUD.dto.response;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class RouteMasterResponse {
 
@@ -11,4 +13,5 @@ public class RouteMasterResponse {
     private String destinationLocation;
     private Double distance;
     private String estimatedTime;
+    private List<StopMasterResponse> stops;
 }
