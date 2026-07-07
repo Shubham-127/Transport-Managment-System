@@ -29,6 +29,10 @@ public class OrderMaster {
     private String company;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shipment_id") // nullable — an order might not be shipped yet
+    private ShipmentMaster shipment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id",nullable = false)
     private CustomerMaster customer;
 
