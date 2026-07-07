@@ -8,7 +8,9 @@ import lombok.*;
 // URL path, not the request body (same pattern as Vehicle/Lines)
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class CreateStopMasterRequest {
-
-    private Double distanceFromSource;
-    private String stopName;
+    private Long routeMasterId;
+    private Integer stopSequence;
+    private String stopLocation;
+    private Double distanceFromPrevious;
+    private String estimatedTimeFromPrevious;
 }
