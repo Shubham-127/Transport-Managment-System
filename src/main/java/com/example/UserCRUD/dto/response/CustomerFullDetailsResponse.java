@@ -12,7 +12,7 @@ public class CustomerFullDetailsResponse {
     private Long id;
     private Long customerId;
     private String customerName;
-    private String getNumber;
+    private String gstNumber;
     private String panNumber;
     private String contactPerson;
     private String mobile;
