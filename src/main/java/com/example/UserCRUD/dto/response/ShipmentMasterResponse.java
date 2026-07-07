@@ -15,6 +15,8 @@ public class ShipmentMasterResponse {
     private String remarks;
     // ShipmentMasterResponse.java — add this field
     private List<Long> orderIds;
+    // ShipmentMasterResponse.java
+    private Long routeId;
 
     private List<OrderWithLinesResponse> orders; // reusing your existing DTO
 }

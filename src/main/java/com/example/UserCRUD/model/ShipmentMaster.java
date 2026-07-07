@@ -24,7 +24,7 @@ public class ShipmentMaster {
     private String shipmentNumber;
 
     // every order in this shipment MUST belong to this customer
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "customer_id", nullable = false)
     private CustomerMaster customer;
 
@@ -32,7 +32,10 @@ public class ShipmentMaster {
     private String shipmentDate;
 
     @Column(nullable = false)
-    private String status; // e.g. "CREATED", "DISPATCHED", "DELIVERED"
+    private String status;
+
+    @Column(name = "route_id")
+    private Long routeId;// e.g. "CREATED", "DISPATCHED", "DELIVERED"
 
     @Column
     private String remarks;

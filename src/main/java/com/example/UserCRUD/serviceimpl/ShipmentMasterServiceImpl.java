@@ -8,18 +8,24 @@ import com.example.UserCRUD.exception.ResourceNotFoundException;
 import com.example.UserCRUD.model.CustomerMaster;
 import com.example.UserCRUD.model.OrderLinesMaster;
 import com.example.UserCRUD.model.OrderMaster;
+import com.example.UserCRUD.model.RouteMaster;
 import com.example.UserCRUD.model.ShipmentMaster;
+import com.example.UserCRUD.model.StopMaster;
 import com.example.UserCRUD.repository.CustomerMasterRepository;
 import com.example.UserCRUD.repository.OrderLinesMasterRepository;
 import com.example.UserCRUD.repository.OrderMasterRepository;
+import com.example.UserCRUD.repository.RouteMasterRepository;
 import com.example.UserCRUD.repository.ShipmentMasterRepository;
+import com.example.UserCRUD.repository.StopMasterRepository;
 import com.example.UserCRUD.service.ShipmentMasterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +36,8 @@ public class ShipmentMasterServiceImpl implements ShipmentMasterService {
     private final CustomerMasterRepository customerMasterRepository;
     private final OrderMasterRepository orderMasterRepository;
     private final OrderLinesMasterRepository orderLinesMasterRepository;
+    private final RouteMasterRepository routeMasterRepository;
+    private final StopMasterRepository stopMasterRepository;
 
     @Override
     @Transactional
@@ -73,7 +81,22 @@ public class ShipmentMasterServiceImpl implements ShipmentMasterService {
             throw new RuntimeException("One or more orders are already assigned to a different shipment");
         }
 
-        // Step 7 — create the shipment, including the order IDs directly on the row
+        // Step 6.5 — resolve each order's route (via shipToCity), and make sure
+        // they ALL resolve to the SAME route
+        Map<String, Long> cityToRouteId = buildCityToRouteIdMap();
+
+        List<Long> resolvedRouteIds = orders.stream()
+                .map(order -> resolveRouteIdForOrder(order, cityToRouteId))
+                .distinct()
+                .collect(Collectors.toList());
+
+        if (resolvedRouteIds.size() > 1) {
+            throw new RuntimeException("All orders in a shipment must belong to the same route. Found multiple routes: " + resolvedRouteIds);
+        }
+
+        Long shipmentRouteId = resolvedRouteIds.get(0);
+
+        // Step 7 — create the shipment, including order IDs + resolved route ID
         ShipmentMaster shipment = ShipmentMaster.builder()
                 .shipmentNumber(request.getShipmentNumber())
                 .customer(customer)
@@ -81,6 +104,7 @@ public class ShipmentMasterServiceImpl implements ShipmentMasterService {
                 .status(request.getStatus())
                 .remarks(request.getRemarks())
                 .orderIds(orders.stream().map(OrderMaster::getId).collect(Collectors.toList()))
+                .routeId(shipmentRouteId)
                 .build();
 
         ShipmentMaster savedShipment = shipmentMasterRepository.save(shipment);
@@ -112,7 +136,6 @@ public class ShipmentMasterServiceImpl implements ShipmentMasterService {
         }
 
         // Step 3 — every order must belong to the SAME customer as the shipment
-        // (the shipment's existing customer is the source of truth here)
         boolean allSameCustomer = ordersToAdd.stream()
                 .allMatch(order -> order.getCustomer().getId().equals(shipment.getCustomer().getId()));
 
@@ -127,6 +150,18 @@ public class ShipmentMasterServiceImpl implements ShipmentMasterService {
 
         if (anyAlreadyShipped) {
             throw new RuntimeException("One or more orders are already assigned to a shipment");
+        }
+
+        // Step 4.5 — new orders must resolve to the SAME route already set on this shipment
+        Map<String, Long> cityToRouteId = buildCityToRouteIdMap();
+
+        for (OrderMaster order : ordersToAdd) {
+            Long resolvedRouteId = resolveRouteIdForOrder(order, cityToRouteId);
+            if (!resolvedRouteId.equals(shipment.getRouteId())) {
+                throw new RuntimeException(
+                        "Order " + order.getId() + " belongs to a different route (resolved routeId: " + resolvedRouteId
+                                + ") than the shipment's route (routeId: " + shipment.getRouteId() + ")");
+            }
         }
 
         // Step 5 — link them (order_master.shipment_id)
@@ -191,7 +226,38 @@ public class ShipmentMasterServiceImpl implements ShipmentMasterService {
                 .collect(Collectors.toList());
     }
 
-    // ─── PRIVATE HELPERS ──────────────────────────────────
+    // ─── ROUTE RESOLUTION HELPERS ──────────────────────────────────
+
+    // Builds a normalized city -> routeId lookup ONCE, instead of scanning
+    // all routes/stops separately for every single order
+    private Map<String, Long> buildCityToRouteIdMap() {
+        List<RouteMaster> allRoutes = routeMasterRepository.findAll();
+        List<StopMaster> allStops = stopMasterRepository.findAll();
+
+        Map<Long, List<StopMaster>> stopsByRouteId = allStops.stream()
+                .collect(Collectors.groupingBy(stop -> stop.getRouteMaster().getId())); // adjust getter if your field is named differently
+
+        Map<String, Long> cityToRouteId = new HashMap<>();
+        for (RouteMaster route : allRoutes) {
+            cityToRouteId.putIfAbsent(normalize(route.getDestinationLocation()), route.getId());
+            for (StopMaster stop : stopsByRouteId.getOrDefault(route.getId(), List.of())) {
+                cityToRouteId.putIfAbsent(normalize(stop.getStopLocation()), route.getId());
+            }
+        }
+        return cityToRouteId;
+    }
+
+    // Resolves the routeId for a single order, rejecting it if no route matches its shipToCity
+    private Long resolveRouteIdForOrder(OrderMaster order, Map<String, Long> cityToRouteId) {
+        Long routeId = cityToRouteId.get(normalize(order.getShipToCity()));
+        if (routeId == null) {
+            throw new RuntimeException(
+                    "Order " + order.getId() + " (shipToCity: " + order.getShipToCity() + ") does not match any route");
+        }
+        return routeId;
+    }
+
+    // ─── MAPPING HELPERS ──────────────────────────────────
 
     private ShipmentMasterResponse mapToResponseDTO(ShipmentMaster shipment, List<OrderMaster> orders) {
 
@@ -238,6 +304,7 @@ public class ShipmentMasterServiceImpl implements ShipmentMasterService {
                 .status(shipment.getStatus())
                 .remarks(shipment.getRemarks())
                 .orderIds(shipment.getOrderIds())
+                .routeId(shipment.getRouteId())
                 .orders(orderResponses)
                 .build();
     }
@@ -258,5 +325,9 @@ public class ShipmentMasterServiceImpl implements ShipmentMasterService {
                 .unitVolume(line.getUnitVolume())
                 .volumeUnit(line.getVolumeUnit())
                 .build();
+    }
+
+    private String normalize(String city) {
+        return city == null ? "" : city.trim().toLowerCase();
     }
 }
