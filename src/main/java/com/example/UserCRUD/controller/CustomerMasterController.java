@@ -4,6 +4,7 @@ import com.example.UserCRUD.dto.request.Create.CreateCustomerMasterRequest;
 import com.example.UserCRUD.dto.request.Update.UpdateCustomerMasterRequest;
 import com.example.UserCRUD.dto.response.CustomerFullDetailsResponse;
 import com.example.UserCRUD.dto.response.CustomerMasterResponse;
+import com.example.UserCRUD.dto.response.CustomerOrderWithRouteResponse;
 import com.example.UserCRUD.service.CustomerMasterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -55,5 +56,10 @@ public class CustomerMasterController {
     @GetMapping("/{id}/full-details")
     public ResponseEntity<CustomerFullDetailsResponse> getCustomerFullDetails(@PathVariable Long id) {
         return ResponseEntity.ok(customerService.getCustomerFullDetails(id));
+    }
+
+    @GetMapping("/{id}/full-details-with-route")
+    public ResponseEntity<CustomerOrderWithRouteResponse> getCustomerOrderWithRoute(@PathVariable Long id) {
+        return ResponseEntity.ok(customerService.getCustomerOrderWithRouteResponse(id));
     }
 }
