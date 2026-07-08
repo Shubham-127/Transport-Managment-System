@@ -1,9 +1,0 @@
-package com.example.UserCRUD.integration.common;
-
-import com.example.UserCRUD.integration.common.domain.ErpOrder;
-import java.util.List;
-
-public interface ErpConnector {
-    List<ErpOrder> fetchOrders();
-    ErpOrder fetchOrder(String orderNumber);
-}
