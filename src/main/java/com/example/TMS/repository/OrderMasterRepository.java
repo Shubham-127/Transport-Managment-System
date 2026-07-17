@@ -4,6 +4,7 @@ import com.example.TMS.model.OrderMaster;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -11,4 +12,5 @@ public interface OrderMasterRepository extends JpaRepository<OrderMaster, Long> 
 
     boolean existsByOrderNumber(Long orderNumber);
     Optional<OrderMaster> findByOrderNumber(Long orderNumber);
+    List<OrderMaster> findByShipmentId(Long shipmentId);
 }

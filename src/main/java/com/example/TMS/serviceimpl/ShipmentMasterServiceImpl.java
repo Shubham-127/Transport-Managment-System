@@ -110,7 +110,8 @@ public class ShipmentMasterServiceImpl implements ShipmentMasterService {
         ShipmentMaster savedShipment = shipmentMasterRepository.save(shipment);
 
         // Step 8 — link each order to this shipment (order_master.shipment_id)
-        orders.forEach(order -> order.setShipment(savedShipment));
+        orders.forEach(order -> {order.setShipment(savedShipment);
+        order.setStatus("Added To Shipment");});
         orderMasterRepository.saveAll(orders);
 
         return mapToResponseDTO(savedShipment, orders);
@@ -165,7 +166,8 @@ public class ShipmentMasterServiceImpl implements ShipmentMasterService {
         }
 
         // Step 5 — link them (order_master.shipment_id)
-        ordersToAdd.forEach(order -> order.setShipment(shipment));
+        ordersToAdd.forEach(order -> {order.setShipment(shipment);
+        order.setStatus("Added To Shipment");});
         orderMasterRepository.saveAll(ordersToAdd);
 
         // Step 6 — update the shipment's orderIds array to include the newly added orders
