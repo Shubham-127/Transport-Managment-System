@@ -5,6 +5,7 @@ import com.example.TMS.dto.response.ShipmentBidResponse;
 import com.example.TMS.service.ShipmentBidService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public class ShipmentBidController {
     private final ShipmentBidService shipmentBidService;
 
     @PostMapping("/{shipmentId}/bids")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<ShipmentBidResponse> placeBid(
             @PathVariable Long shipmentId,
             @RequestBody CreateShipmentBidRequest request) {
@@ -23,11 +25,13 @@ public class ShipmentBidController {
     }
 
     @GetMapping("/{shipmentId}/bids")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ShipmentBidResponse>> getBidsForShipment(@PathVariable Long shipmentId) {
         return ResponseEntity.ok(shipmentBidService.getBidsForShipment(shipmentId));
     }
 
     @PostMapping("/{shipmentId}/bids/{bidId}/accept")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<ShipmentBidResponse> acceptBid(
             @PathVariable Long shipmentId,
             @PathVariable Long bidId) {

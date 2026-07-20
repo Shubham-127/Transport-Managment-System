@@ -8,6 +8,7 @@ import com.example.TMS.service.VehicleMasterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class VehicleMasterController {
     private final VehicleMasterService vehicleMasterService;
 
     @PostMapping("/transport/{transportId}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<VehicleMasterResponse> createVehicle(
             @PathVariable Long transportId,
             @RequestBody CreateVehicleMasterRequest request) {
@@ -31,6 +33,7 @@ public class VehicleMasterController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<VehicleMasterResponse> getVehicleById(
             @PathVariable Long id) {
 
@@ -39,6 +42,7 @@ public class VehicleMasterController {
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<VehicleMasterResponse>> getAllVehicles() {
 
         return ResponseEntity.ok(
@@ -46,6 +50,7 @@ public class VehicleMasterController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<VehicleMasterResponse> updateVehicle(
             @PathVariable Long id,
             @RequestBody UpdateVehicleMasterRequest request) {
@@ -57,6 +62,7 @@ public class VehicleMasterController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteVehicle(
             @PathVariable Long id) {
 

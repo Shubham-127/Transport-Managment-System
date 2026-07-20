@@ -8,6 +8,7 @@ import com.example.TMS.dto.response.responsedto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.example.TMS.service.UserService;
 
@@ -20,17 +21,19 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
+
     public ResponseEntity<responsedto> createUser(@RequestBody CreateUserRequestdto request) {
         responsedto response = userService.createUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<responsedto>> getAllUsers(){
 
         return ResponseEntity.ok(userService.getAllUsers());
     }
     @PutMapping("/{id}")
-    public ResponseEntity<responsedto> updateUser(
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")public ResponseEntity<responsedto> updateUser(
             @PathVariable Long id,
             @RequestBody UpdateUserRequestdto request
             ){
@@ -39,11 +42,13 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id){
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
     @PostMapping("/login")
+
     public ResponseEntity<LoginResponsedto> login(@RequestBody LoginRequestdto request) {
         return ResponseEntity.ok(userService.login(request));
     }

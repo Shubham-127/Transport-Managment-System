@@ -8,6 +8,7 @@ import com.example.TMS.service.TransportMasterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,21 +21,25 @@ public class TransportMasterController {
     private final TransportMasterService transportMasterService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<TransportMasterResponse> createTransport(@RequestBody CreateTransportMasterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(transportMasterService.createTransport(request));
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<TransportMasterResponse>> getAllTransports() {
         return ResponseEntity.ok(transportMasterService.getAllTransports());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<TransportMasterResponse> getTransportById(@PathVariable Long id) {
         return ResponseEntity.ok(transportMasterService.getTransportById(id));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<TransportMasterResponse> updateTransport(
             @PathVariable Long id,
             @RequestBody UpdateTransportMasterRequest request) {
@@ -42,6 +47,7 @@ public class TransportMasterController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteTransport(@PathVariable Long id) {
         transportMasterService.deleteTransport(id);
         return ResponseEntity.noContent().build();

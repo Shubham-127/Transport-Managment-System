@@ -202,15 +202,16 @@ public class ShipmentMasterServiceImpl implements ShipmentMasterService {
 
     @Override
     public List<ShipmentMasterResponse> getAllShipments() {
-        return shipmentMasterRepository.findAll()
+        List<ShipmentMaster> shipments = shipmentMasterRepository.findAll();
+
+        // one query total, instead of one per shipment
+        Map<Long, List<OrderMaster>> ordersByShipmentId = orderMasterRepository.findAll()
                 .stream()
-                .map(shipment -> {
-                    List<OrderMaster> orders = orderMasterRepository.findAll()
-                            .stream()
-                            .filter(order -> order.getShipment() != null && order.getShipment().getId().equals(shipment.getId()))
-                            .collect(Collectors.toList());
-                    return mapToResponseDTO(shipment, orders);
-                })
+                .filter(order -> order.getShipment() != null)
+                .collect(Collectors.groupingBy(order -> order.getShipment().getId()));
+
+        return shipments.stream()
+                .map(shipment -> mapToResponseDTO(shipment, ordersByShipmentId.getOrDefault(shipment.getId(), List.of())))
                 .collect(Collectors.toList());
     }
 

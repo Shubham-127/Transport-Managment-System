@@ -7,6 +7,7 @@ import com.example.TMS.service.OrderMasterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,21 +20,25 @@ public class OrderMasterController {
     private final OrderMasterService orderMasterService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<OrderMasterResponse> createOrder(@RequestBody CreateOrderMasterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(orderMasterService.createOrder(request));
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<OrderMasterResponse>> getAllOrders() {
         return ResponseEntity.ok(orderMasterService.getAllOrders());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<OrderMasterResponse> getOrderById(@PathVariable Long id) {
         return ResponseEntity.ok(orderMasterService.getOrderById(id));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<OrderMasterResponse> updateOrder(
             @PathVariable Long id,
             @RequestBody UpdateOrderMasterRequest request) {
@@ -41,6 +46,7 @@ public class OrderMasterController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
         orderMasterService.deleteOrder(id);
         return ResponseEntity.noContent().build();

@@ -7,6 +7,7 @@ import com.example.TMS.service.RouteMasterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,21 +20,25 @@ public class RouteMasterController {
     private final RouteMasterService routeMasterService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<RouteMasterResponse> createRoute(@RequestBody CreateRouteMasterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(routeMasterService.createRoute(request));
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<RouteMasterResponse>> getAllRoutes() {
         return ResponseEntity.ok(routeMasterService.getAllRoutes());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<RouteMasterResponse> getRouteById(@PathVariable Long id) {
         return ResponseEntity.ok(routeMasterService.getRouteById(id));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<RouteMasterResponse> updateRoute(
             @PathVariable Long id,
             @RequestBody UpdateRouteMasterRequest request) {
@@ -41,6 +46,7 @@ public class RouteMasterController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteRoute(@PathVariable Long id) {
         routeMasterService.deleteRoute(id);
         return ResponseEntity.noContent().build();

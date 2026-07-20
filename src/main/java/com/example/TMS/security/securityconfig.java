@@ -1,13 +1,15 @@
 package com.example.TMS.security;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -15,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @RequiredArgsConstructor
+@EnableMethodSecurity   // ← NEW: enables @PreAuthorize on controller methods
 public class securityconfig {
 
     private final JwtAuthFilter jwtAuthFilter;
@@ -28,27 +31,45 @@ public class securityconfig {
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
-
         provider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(provider);
     }
-
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Login and registration endpoints are OPEN — no token needed yet
-                        .requestMatchers("/api/users","/api/users/login").permitAll()
-                        // Everything else requires a valid JWT
+
+                        // ─── PUBLIC endpoints — no token needed ──────────────
+                        .requestMatchers(HttpMethod.POST, "/api/users/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+
+                        // ─── BROAD RULES — applied at URL level ──────────────
+
+                        // All DELETE operations → ADMIN only
+                        .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
+
+                        // Role management → ADMIN only
+                        .requestMatchers(HttpMethod.POST, "/api/roles/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,  "/api/roles/**").hasRole("ADMIN")
+
+                        // User management → ADMIN only
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
+
+                        // All GET operations → any authenticated user
+                        .requestMatchers(HttpMethod.GET, "/api/**").authenticated()
+
+                        // All POST/PUT on business entities → ADMIN or MANAGER
+                        .requestMatchers(HttpMethod.POST, "/api/**").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers(HttpMethod.PUT,  "/api/**").hasAnyRole("ADMIN", "MANAGER")
+
+                        // Everything else → must be authenticated
                         .anyRequest().authenticated()
                 )
-                // Insert our custom filter BEFORE Spring's default username/password filter
-                // This is what makes JwtAuthFilter actually run on every request
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
 
         return http.build();
     }

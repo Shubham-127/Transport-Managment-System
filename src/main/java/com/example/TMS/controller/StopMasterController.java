@@ -7,6 +7,7 @@ import com.example.TMS.service.StopMasterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class StopMasterController {
     // matches the pattern from your VehicleMasterController:
     // /api/vehicles/transport/{transportId}
     @PostMapping("/route/{routeId}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<StopMasterResponse> createStop(
             @PathVariable Long routeId,
             @RequestBody CreateStopMasterRequest request) {
@@ -29,16 +31,19 @@ public class StopMasterController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<StopMasterResponse> getStopById(@PathVariable Long id) {
         return ResponseEntity.ok(stopMasterService.getStopById(id));
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<StopMasterResponse>> getAllStops() {
         return ResponseEntity.ok(stopMasterService.getAllStops());
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
     public ResponseEntity<StopMasterResponse> updateStop(
             @PathVariable Long id,
             @RequestBody UpdateStopMasterRequest request) {
@@ -46,6 +51,7 @@ public class StopMasterController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteStop(@PathVariable Long id) {
         stopMasterService.deleteStop(id);
         return ResponseEntity.noContent().build();
